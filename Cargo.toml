@@ -1,0 +1,12 @@
+[package]
+name = "minecart"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+reqwest = { version = "0.11.13"}
+serde_json = "1.0.89"
+tokio = { version = "1.22.0", features = ["full"] }
+
