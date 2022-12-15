@@ -6,8 +6,10 @@ use async_trait::async_trait;
 static API_KEY: &str = "$2a$10$jR8T/MwHd2DD4ziEB0SqTObIPkn2TYX6rPY/t5YSkznUL7lv9rFQ.";
 static URL: &str = "https://api.curseforge.com/v1/mods/search?gameId=432&classId=5&searchFilter=";
 
-pub struct BukkitHandler {}
+pub struct BukkitHandler;
     
+
+
 #[derive(Deserialize)]
 struct SearchResult {
     data: Vec<Value>
@@ -34,17 +36,64 @@ impl SearchProivder for BukkitHandler {
             Err(body) => {
                 println!("FETCH BODY: {}", body);
                 std::process::exit(0);
-            }
+            }         
         };
-        let data: SearchResult = match serde_json::from_str(body.as_str()) {
-            Ok(data) => {data}
-            Err(data) => {
-                println!("PARSE JSON: {}", data);
-                std::process::exit(0);
-            }
-        };
+        let data: SearchResult = serde_json::from_str(body.as_str()).expect("Parse Json Error");
 
 
         return data.data;
     }  
+}
+
+
+
+
+#[async_trait]
+impl AuthorProvider for BukkitHandler {
+    async fn getAuthor(&self, data: &Value) -> String {
+        return data.get("authors").unwrap().get(0).unwrap().get("name").unwrap().as_str().unwrap().to_string();
+    }
+
+}
+
+#[async_trait]
+impl FileProvider for BukkitHandler {
+    async fn getFile(&self, data: &Value) -> File {
+        let latest_files = data.get("latestFiles").unwrap();
+        let file = File {
+           size: latest_files.get(0).unwrap().get("fileLength").unwrap().as_i64().unwrap() as f64,
+           unit: "b".to_string(),
+           url: "bob".to_string(),
+        };
+
+        return file;
+
+    }
+
+}
+
+#[async_trait]
+impl VersionProvider for BukkitHandler {
+    async fn getVersion(&self, data: &Value) -> String {
+        let latest_files = data.get("latestFiles").unwrap();
+        return latest_files.get(0).unwrap().get("id").unwrap().as_str().unwrap().to_string();
+    }
+
+}
+
+#[async_trait]
+impl ResourceProvider for BukkitHandler {
+    async fn format_data(&self, data: &Value) -> Resource {
+        return Resource {
+           provider: "bukkit".to_string(),
+           name: data.get("name").unwrap().as_str().unwrap().to_string(),
+           slug: data.get("id").unwrap().to_string(),
+           author: self.getAuthor(data).await,
+           file: self.getFile(data).await,
+           version: self.getVersion(data).await
+
+           
+            
+        };
+    }
 }

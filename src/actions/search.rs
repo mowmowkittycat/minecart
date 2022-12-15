@@ -6,7 +6,7 @@ pub async fn exec(args: Vec<String>) {
 
     for provider in result {
         for resource in provider {
-            println!("{}", resource["name"]);
+            println!("{}/{} ver. {} by {}",resource.provider, resource.slug,resource.version, resource.author);
         }
 
 
