@@ -22,7 +22,6 @@ fn main() {
             .padding_lrtb(1, 1, 1, 0)
             .content(EditView::new().with_name("search"))
             .button("Ok", move |s| {
-                println!("lambda block");
                 // s.pop_layer();
                 rt.block_on(perform_search(s));
             }),
@@ -34,7 +33,6 @@ fn main() {
 
 async fn perform_search(s: &mut Cursive) {
     let mut choose = ListView::new();
-    println!("searching...");
     let search = s
         .call_on_name("search", |view: &mut EditView| view.get_content())
         .unwrap();
