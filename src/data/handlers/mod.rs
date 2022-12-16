@@ -1,14 +1,12 @@
-use serde_json::{Value};
+use super::structure::{File, Resource};
 use async_trait::async_trait;
-use super::structure::{Resource, File};
+use serde_json::Value;
 
 pub mod bukkit;
 pub mod spigot;
 
-
 pub trait Provider: SearchProivder + ResourceProvider {}
 impl<T> Provider for T where T: SearchProivder + ResourceProvider {}
-
 
 #[async_trait]
 pub trait SearchProivder {
@@ -22,16 +20,15 @@ pub trait ResourceProvider {
 
 #[async_trait]
 pub trait AuthorProvider {
-    async fn getAuthor(&self, data: &Value) -> String;
-
+    async fn get_author(&self, data: &Value) -> String;
 }
 
 #[async_trait]
 pub trait VersionProvider {
-    async fn getVersion(&self, data: &Value) -> String; 
+    async fn get_version(&self, data: &Value) -> String;
 }
 
 #[async_trait]
 pub trait FileProvider {
-    async fn getFile(&self, data: &Value) -> File;
+    async fn get_file(&self, data: &Value) -> File;
 }

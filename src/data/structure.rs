@@ -1,4 +1,3 @@
-
 pub struct File {
     pub size: f64,
     pub unit: String,
@@ -10,7 +9,5 @@ pub struct Resource {
     pub slug: String,
     pub author: String,
     pub file: File,
-    pub version: String
-    
-
+    pub version: String,
 }
