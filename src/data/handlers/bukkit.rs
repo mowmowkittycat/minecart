@@ -87,8 +87,6 @@ impl VersionProvider for BukkitHandler {
             .unwrap()
             .get("id")
             .unwrap()
-            .as_str()
-            .unwrap()
             .to_string();
     }
 }

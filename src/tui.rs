@@ -40,19 +40,17 @@ async fn perform_search(s: &mut Cursive) {
     for provider in result {
         for resource in provider {
             choose.add_child(
-                &resource.slug,
+                &resource.name,
                 TextView::new(
-                    resource.provider
-                        + "/"
-                        + &resource.slug
-                        + "ver. "
+                        " ver. ".to_string()
                         + &resource.version
-                        + "by "
+                        + " by "
                         + &resource.author,
                 ),
             );
         }
     }
+    //your tui been messed with bozo
     s.pop_layer();
     s.add_layer(choose.scrollable());
 }
