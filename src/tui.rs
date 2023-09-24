@@ -45,8 +45,7 @@ async fn processor(siv: &mut Cursive) {
                         .enable_all()
                         .build()
                         .unwrap()
-                        .block_on(download(&url, "/home/akshat/plugin.jar".to_string()))
-                        .err()
+                        .block_on(download(&url, "plugin.jar".to_string()))
                         .unwrap();
                     s.quit();
                 })
@@ -78,5 +77,6 @@ async fn download(
     let mut reader = response.bytes().await?.reader();
     let mut file = std::fs::File::create(file_name)?;
     std::io::copy(&mut reader, &mut file)?;
+    println!("{}", url);
     Ok(())
 }
