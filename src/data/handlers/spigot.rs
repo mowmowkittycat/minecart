@@ -76,7 +76,8 @@ impl FileProvider for SpigotHandler {
                 .as_str()
                 .unwrap()
                 .to_string(),
-            url: file_data.get("url").unwrap().as_str().unwrap().to_string(),
+            url: "https://www.spigotmc.org/".to_string()
+                + file_data.get("url").unwrap().as_str().unwrap(),
         };
 
         return file;

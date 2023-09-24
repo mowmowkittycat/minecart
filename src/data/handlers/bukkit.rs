@@ -71,7 +71,14 @@ impl FileProvider for BukkitHandler {
                 .as_i64()
                 .unwrap() as f64,
             unit: "b".to_string(),
-            url: "bob".to_string(),
+            url: latest_files
+                .get(0)
+                .unwrap()
+                .get("downloadUrl")
+                .unwrap()
+                .as_str()
+                .unwrap()
+                .to_string(),
         };
 
         return file;
@@ -82,12 +89,7 @@ impl FileProvider for BukkitHandler {
 impl VersionProvider for BukkitHandler {
     async fn get_version(&self, data: &Value) -> String {
         let latest_files = data.get("latestFiles").unwrap();
-        return latest_files
-            .get(0)
-            .unwrap()
-            .get("id")
-            .unwrap()
-            .to_string();
+        return latest_files.get(0).unwrap().get("id").unwrap().to_string();
     }
 }
 

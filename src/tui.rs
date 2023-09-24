@@ -1,6 +1,8 @@
+use bytes::buf::Buf;
+
 use cursive::{
-    view::{Nameable, Scrollable},
-    views::{Dialog, EditView, ListView, TextView},
+    view::Nameable,
+    views::{Dialog, EditView, SelectView, TextView},
     Cursive,
 };
 
@@ -18,39 +20,63 @@ fn main() {
     // Creates a dialog with a single "Quit" button
     siv.add_layer(
         Dialog::new()
-            .title("search")
+            .title("Search")
             .padding_lrtb(1, 1, 1, 0)
             .content(EditView::new().with_name("search"))
-            .button("Ok", move |s| {
-                // s.pop_layer();
-                rt.block_on(perform_search(s));
+            .button("Search", move |s| {
+                rt.block_on(processor(s));
             }),
     );
 
-    // Starts the event loop.
     siv.run();
 }
 
-async fn perform_search(s: &mut Cursive) {
-    let mut choose = ListView::new();
-    let search = s
+async fn processor(siv: &mut Cursive) {
+    let search = siv
         .call_on_name("search", |view: &mut EditView| view.get_content())
         .unwrap();
+
+    let mut choose = SelectView::<String>::new().on_submit(|s: &mut Cursive, url: &String| {
+        let url: String = url.clone();
+        s.add_layer(
+            Dialog::around(TextView::new(&url))
+                .button("download", move |s| {
+                    tokio::runtime::Builder::new_current_thread()
+                        .enable_all()
+                        .build()
+                        .unwrap()
+                        .block_on(download(&url, "plugin.jar".to_string()))
+                        .unwrap();
+                    s.quit();
+                })
+                .button("close", |s| {
+                    s.pop_layer();
+                }),
+        );
+    });
+
     let result = data::search(&search).await;
     for provider in result {
         for resource in provider {
-            choose.add_child(
-                &resource.name,
-                TextView::new(
-                        " ver. ".to_string()
-                        + &resource.version
-                        + " by "
-                        + &resource.author,
-                ),
+            choose.add_item(
+                resource.name + " ver. " + &resource.version + " by " + &resource.author,
+                resource.file.url,
             );
         }
     }
+
     //your tui been messed with bozo
-    s.pop_layer();
-    s.add_layer(choose.scrollable());
+    siv.add_layer(Dialog::around(choose).button("quit", |s| s.quit()));
+}
+
+async fn download(
+    url: &String,
+    file_name: String,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let response = reqwest::get(url).await?;
+    let mut reader = response.bytes().await?.reader();
+    let mut file = std::fs::File::create(file_name)?;
+    std::io::copy(&mut reader, &mut file)?;
+    println!("{}", url);
+    Ok(())
 }

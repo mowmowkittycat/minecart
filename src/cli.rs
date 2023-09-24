@@ -5,7 +5,7 @@ mod data;
 async fn main() {
     let mut args: Vec<String> = std::env::args().collect();
     args.remove(0);
-    if args.len() == 0 {
+    if args.is_empty() {
         actions::help::exec(args);
         std::process::exit(0);
     }
